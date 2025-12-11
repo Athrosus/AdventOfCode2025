@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 
 Console.WriteLine("Hello, World!");
 
-//var input = File.ReadAllLines("input.txt");
-var input = File.ReadAllLines("testInput.txt");
+var input = File.ReadAllLines("input.txt");
+//var input = File.ReadAllLines("testInput.txt");
 
 
 Console.WriteLine(Solution.GetSolution2(input));
@@ -17,18 +18,34 @@ public static class Solution
     {
         var parsedInput = ParseData(input);
         List<List<long>> spans = parsedInput.spans;
+        List<List<long>> newSpans = new();
+        spans.Sort((x,y) => x[0].CompareTo(y[0]));
         List<long> foods = parsedInput.foods;
         long sum = 0;
+        List<long> newSpan = spans[0];
+
 
         foreach (var span in spans)
         {
-            // this doesnt work because there are overlaping spans.
-            // first you sort the spans by their mins.
-            // I think I need to make something that will goe throu the spans,
-            // colaps the spans together combining spans if their min fals under the currantly being made span and take the new soon to be collapsed spans max
-            // this stops when the next spans min isnt inside the collapsed span and a new collapsed span is created
-            // do this untill you run out of spans.
-            long count = span[1] - span[0];
+            if(newSpan[1] >= span[0])
+            {
+                if (span[1] > newSpan[1])
+                {
+                    newSpan[1] = span[1];
+                }
+            }
+            else
+            {
+                newSpans.Add(newSpan);
+                newSpan = new(span);
+            }
+        }
+        newSpans.Add(newSpan);
+
+        foreach (var span in newSpans)
+        {
+            //Console.WriteLine("In new spans we have a span: " + span[0] + " - " + span[1]);
+            long count = span[1] - span[0] + 1;
             sum += count;
         }
 
